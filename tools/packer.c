@@ -31,6 +31,7 @@
 
 #include "config.h"
 #include "introspection.h"
+#include "md4.h"
 #include "ulp_common.h"
 
 #include "packer.h"
@@ -592,17 +593,55 @@ get_symbol_addr(Elf *elf, Elf_Scn *s, char *search)
 }
 
 int
-generate_random_patch_id(struct ulp_metadata *ulp)
+write_patch_id(struct ulp_metadata *ulp, char *description,
+               __attribute__((unused)) char *livepatch)
 {
-  int r;
-  r = open("/dev/urandom", O_RDONLY);
-  if (read(r, &ulp->patch_id, 32) < 0) {
-    WARN("Error generating patch id.");
-    close(r);
-    return 0;
+  MD4_CTX context;
+  char digest[16];
+  char *input;
+  int length;
+  int retcode;
+  FILE *fp;
+
+  /* Read the whole description file into memory to use as digest input. */
+  fp = fopen(description, "r");
+  if (fp == NULL) {
+    WARN("error opening %s: %s", description, strerror(errno));
+    return 1;
   }
-  close(r);
-  return 1;
+  retcode = fseek(fp, 0, SEEK_END);
+  if (retcode == -1) {
+    WARN("error seeking %s: %s", description, strerror(errno));
+    return 1;
+  }
+  length = ftell(fp);
+  if (length == -1) {
+    WARN("error checking length of %s: %s", description, strerror(errno));
+    return 1;
+  }
+  rewind(fp);
+  input = malloc(length);
+  if (input == NULL) {
+    WARN("unable to allocate memory: %s", strerror(errno));
+    return 1;
+  }
+  retcode = fread(input, 1, length, fp);
+  if (retcode != length) {
+    WARN("error reading description file to memory: %s\n", strerror(errno));
+    return 1;
+  }
+
+  /* Generate a digest out of the description file. */
+  MD4Init(&context);
+  MD4Update(&context, input, length);
+  MD4Final(digest, &context);
+
+  if (sizeof(ulp->patch_id) < (size_t)length)
+    length = sizeof(ulp->patch_id);
+
+  memcpy(ulp->patch_id, digest, length);
+
+  return 0;
 }
 
 int
@@ -648,8 +687,8 @@ main(int argc, char **argv)
     goto main_error;
   unload_elf(&library_elf, &fd);
 
-  if (!generate_random_patch_id(&ulp))
-    goto main_error;
+  write_patch_id(&ulp, arguments.description, arguments.livepatch);
+
   if (!create_patch_metadata_file(&ulp, arguments.metadata))
     goto main_error;
 
