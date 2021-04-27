@@ -37,7 +37,7 @@ print('First call to libparameters... ok.')
 # Apply live patch and check for new behavior
 ret = subprocess.run([trigger, '-p', str(child.pid),
                       'libparameters_livepatch1.ulp'],
-                     stdout=sys.stdout, stderr=sys.stdout)
+                     capture_output=False)
 if ret.returncode:
   print('Failed to apply livepatch #1 for libparameters')
   exit(1)
