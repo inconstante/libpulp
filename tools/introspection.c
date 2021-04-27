@@ -497,11 +497,17 @@ initialize_data_structures(struct ulp_process *process)
 struct ulp_thread *
 search_thread(struct ulp_thread *list, int tid)
 {
+  DEBUG("search_thread begin");
   while (list) {
-    if (list->tid == tid)
+    DEBUG("search_thread loop");
+    DEBUG("search_thread compare (%p %d == %d)", list, list->tid, tid);
+    if (list->tid == tid) {
+      DEBUG("search_thread found");
       return list;
+    }
     list = list->next;
   }
+  DEBUG("search_thread not-found");
   return NULL;
 }
 
