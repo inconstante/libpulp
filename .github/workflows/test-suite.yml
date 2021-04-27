@@ -30,6 +30,6 @@ jobs:
       id: check
     - name: diagnostics
       if: always ()
-      run: cat tests/test-suite.log
+      run: cat tests/test-suite.log tests/parameters.log
     - name: make distcheck
       run: make distcheck
