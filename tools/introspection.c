@@ -607,8 +607,6 @@ hijack_threads(struct ulp_process *process)
       if (tid == 0)
         continue;
 
-      DEBUG("attaching to thread %d", tid);
-
       /* Check that the thread has not already been dealt with. */
       t = search_thread(process->threads, tid);
 

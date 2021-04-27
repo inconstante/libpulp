@@ -175,12 +175,10 @@ main(int argc, char **argv)
       FATAL("fatal error during live patch application (hijacking).");
       return 1;
     }
-    else if (ret > 0) {
+    if (ret > 0) {
       WARN("unable to hijack process.");
       return 1;
     }
-    else
-      DEBUG("hijacking complete.");
 
     result = apply_patch(&target, livepatch);
     if (result == -1) {
