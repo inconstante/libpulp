@@ -596,6 +596,8 @@ hijack_threads(struct ulp_process *process)
   do {
     loop = 0;
 
+    DEBUG("loop attaching to all threads");
+
     /* Start from updated directory listing. */
     rewinddir(taskdir);
 
@@ -607,10 +609,15 @@ hijack_threads(struct ulp_process *process)
       if (tid == 0)
         continue;
 
-      DEBUG("attaching to thread %d", tid);
+      DEBUG("searching for thread %d", tid);
 
       /* Check that the thread has not already been dealt with. */
       t = search_thread(process->threads, tid);
+
+      if (t)
+        DEBUG("already attached to %d", tid);
+      else
+        DEBUG("attaching to %d", tid);
 
       if (t == NULL) {
         /* New thread detected, so set outer loop re-run. */
@@ -655,6 +662,8 @@ hijack_threads(struct ulp_process *process)
       child_alloc_error:
         goto children_restore;
       }
+
+      DEBUG("done attaching to %d", tid);
     }
 
     /*
@@ -668,6 +677,7 @@ hijack_threads(struct ulp_process *process)
     }
   }
   while (loop);
+  DEBUG("finished attaching to all threads in the process.");
 
   /* Release resources and return successfully */
   if (closedir(taskdir))
