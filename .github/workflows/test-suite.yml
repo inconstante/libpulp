@@ -23,6 +23,8 @@ jobs:
       run: ./configure
     - name: make
       run: make
+    - name: permissions check
+      run: cat /proc/sys/kernel/yama/ptrace_scope
     - name: make check
       run: make check
       id: check
