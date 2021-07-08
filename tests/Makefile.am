@@ -136,6 +136,16 @@ libexception_la_LDFLAGS = $(TARGET_LDFLAGS) $(CONVENIENCE_LDFLAGS)
 
 POST_PROCESS += .libs/libexception.post
 
+# Target libraries to test static data access
+check_LTLIBRARIES += libaccess.la
+noinst_HEADERS += libaccess.h
+
+libaccess_la_SOURCES = libaccess.c
+libaccess_la_CFLAGS = $(TARGET_CFLAGS)
+libaccess_la_LDFLAGS = $(TARGET_LDFLAGS) $(CONVENIENCE_LDFLAGS)
+
+POST_PROCESS += .libs/libaccess.post
+
 # Live patches
 check_LTLIBRARIES += libdozens_livepatch1.la \
                      libdozens_livepatch99.la \
@@ -148,7 +158,8 @@ check_LTLIBRARIES += libdozens_livepatch1.la \
                      libblocked_livepatch1.la \
                      libpagecross_livepatch1.la \
                      libaddress_livepatch1.la \
-                     libcontract_livepatch1.la
+                     libcontract_livepatch1.la \
+                     libaccess_livepatch1.la
 
 libdozens_livepatch1_la_SOURCES = libdozens_livepatch1.c
 libdozens_livepatch1_la_LDFLAGS = $(CONVENIENCE_LDFLAGS)
@@ -186,6 +197,9 @@ libaddress_livepatch1_la_LDFLAGS = $(CONVENIENCE_LDFLAGS)
 libcontract_livepatch1_la_SOURCES = libcontract_livepatch1.c
 libcontract_livepatch1_la_LDFLAGS = $(CONVENIENCE_LDFLAGS)
 
+libaccess_livepatch1_la_SOURCES = libaccess_livepatch1.c
+libaccess_livepatch1_la_LDFLAGS = $(CONVENIENCE_LDFLAGS)
+
 METADATA = \
   libdozens_livepatch1.dsc \
   libdozens_livepatch1.ulp \
@@ -222,7 +236,10 @@ METADATA = \
   libaddress_livepatch1.rev \
   libcontract_livepatch1.dsc \
   libcontract_livepatch1.ulp \
-  libcontract_livepatch1.rev
+  libcontract_livepatch1.rev \
+  libaccess_livepatch1.dsc \
+  libaccess_livepatch1.ulp \
+  libaccess_livepatch1.rev
 
 EXTRA_DIST = \
   libdozens_livepatch1.in \
@@ -236,7 +253,8 @@ EXTRA_DIST = \
   libblocked_livepatch1.in \
   libpagecross_livepatch1.in \
   libaddress_livepatch1.in \
-  libcontract_livepatch1.in
+  libcontract_livepatch1.in \
+  libaccess_livepatch1.in
 
 clean-local:
 	rm -f $(METADATA)
@@ -259,7 +277,8 @@ check_PROGRAMS = \
   constructor \
   cancel \
   contract \
-  exception_handling
+  exception_handling \
+  access
 
 numserv_SOURCES = numserv.c
 numserv_LDADD = libdozens.la libhundreds.la
@@ -338,6 +357,10 @@ exception_handling_SOURCES = exception_handling.cc
 exception_handling_LDADD = libexception.la
 exception_handling_DEPENDENCIES = $(POST_PROCESS) $(METADATA)
 
+access_SOURCES = access.c
+access_LDADD = libaccess.la
+access_DEPENDENCIES = $(POST_PROCESS) $(METADATA)
+
 TESTS = \
   numserv.py \
   numserv_bsymbolic.py \
@@ -356,7 +379,8 @@ TESTS = \
   constructor.py \
   cancel.py \
   contract.py \
-  exception_handling.py
+  exception_handling.py \
+  access.py
 
 XFAIL_TESTS = \
   blocked.py \
