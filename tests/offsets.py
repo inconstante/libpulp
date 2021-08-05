@@ -7,8 +7,11 @@ def find_offset(file, name):
   nm = subprocess.Popen(['nm', file], stdout=subprocess.PIPE,
                         encoding='utf-8')
   for entry in nm.stdout.readlines():
+    print('entry:', entry)
     split = entry.split(sep=' ')
+    print('split:', split)
     symbol = split[2].rstrip('\n')
+    print('symbol:', symbol)
     if symbol == name:
       return split[0]
   return
