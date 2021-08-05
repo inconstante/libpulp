@@ -4,6 +4,7 @@ import argparse
 import subprocess
 
 def find_offset(file, name):
+  print('looking for:', name)
   nm = subprocess.Popen(['nm', file], stdout=subprocess.PIPE,
                         encoding='utf-8')
   for entry in nm.stdout.readlines():
@@ -13,7 +14,9 @@ def find_offset(file, name):
     symbol = split[2].rstrip('\n')
     print('symbol:', symbol)
     if symbol == name:
+      print('found')
       return split[0]
+    print('not found')
   return
 
 # This program takes two arguments, first the path to the input file, then the
